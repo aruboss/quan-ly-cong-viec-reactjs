@@ -5,7 +5,70 @@ import Control from './components/Control'
 import TaskList from './components/TaskList'
 
 class App extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      tasks: [], //id: duy nhat (unique), name, status
+      isDisplayForm: false
+    }
+
+  }
+//gọi khi component của mình đc gán vào (khi load lại trang)
+  componentWillMount(){
+      if(localStorage && localStorage.getItem('tasks')){
+        var tasks = JSON.parse(localStorage.getItem('tasks'));
+        this.setState({
+          tasks: tasks
+        });
+      }
+  }
+
+    onGenerateData = () => {
+        var tasks=[
+          {
+            id: this.generateID(),
+            name: 'Học Lập Trình',
+            status: true
+          },
+          {
+            id: this.generateID(),
+            name: 'Đi bơi',
+            status: false
+          },
+          {
+            id: this.generateID(),
+            name: 'Ngủ',
+            status: true          
+          }
+        ];
+        this.setState({
+          tasks: tasks
+        });
+        localStorage.setItem('tasks',JSON.stringify(tasks));
+    }
+
+  // random ra 1 số bất kỳ 
+    s4(){
+      return Math.floor((1+Math.random()) * 0x10000).toString(16).substring(1);
+    }
+
+    generateID(){
+      return this.s4() + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' +this.s4() + this.s4() +this.s4();   
+    }
+    onToggleForm = () => {
+      this.setState({
+        isDisplayForm: !this.state.isDisplayForm
+      });
+    }
+    onCloseForm = () => {
+      this.setState({
+        isDisplayForm: false
+      });
+    }
+
   render() {
+    var {tasks, isDisplayForm} = this.state;
+    var elmTaskForm = isDisplayForm ? <TaskForm onCloseForm={this.onCloseForm} /> : '';
     return (
       <div>
         <meta charSet="utf-8" />
@@ -19,19 +82,27 @@ class App extends Component {
             <hr />
           </div>
           <div className="row">
-            <div className="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <div className={isDisplayForm?"col-xs-4 col-sm-4 col-md-4 col-lg-4":''}>
             {/*Form*/}
-              <TaskForm />
+              {elmTaskForm}
             </div>
-            <div className="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-              <button type="button" className="btn btn-primary">
+            <div className={isDisplayForm?"col-xs-8 col-sm-8 col-md-8 col-lg-8":"col-xs-12 col-sm-12 col-md-12 col-lg-12"}>
+              <button 
+                type="button" 
+                className="btn btn-primary"
+                onClick={this.onToggleForm}
+              >
                 <span className="fa fa-plus mr-5" />Thêm Công Việc
-              </button> 
-              {/*tìm kiếm và sắp xếp */}
+              </button>
+              {/*tạo dữ liệu mẫu*/}
+              <button type="button" className="btn btn-danger ml-5" onClick={this.onGenerateData}>
+              GenerateData 
+              </button>       
+                {/*tìm kiếm và sắp xếp */}
                 <Control />
               <div className="row mt-15">
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                  <TaskList />
+                  <TaskList tasks={tasks}/>
                 </div>
               </div>
             </div>
