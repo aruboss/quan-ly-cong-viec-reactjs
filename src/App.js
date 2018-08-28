@@ -9,7 +9,8 @@ class App extends Component {
     super(props);
     this.state = {
       tasks: [], //id: duy nhat (unique), name, status
-      isDisplayForm: false
+      isDisplayForm: false,
+      taskEditing: null
     }
 
   }
@@ -43,12 +44,26 @@ class App extends Component {
       });
     }
 
+    onShowForm = () => {
+       this.setState({
+        isDisplayForm: true
+      });
+    }
+
     onSubmit = (data) => {
       var {tasks} = this.state;
-      data.id = this.generateID();//task
+      if(data.id===''){
+         data.id = this.generateID();//task
       tasks.push(data);
+    }else{
+      //edit
+      var index = this.findIndex(data.id);
+      tasks[index]=data;
+    }
+     
       this.setState({
-        tasks: tasks
+        tasks: tasks,
+        taskEditing: null
       });
       localStorage.setItem('tasks',JSON.stringify(tasks));
     }
@@ -90,9 +105,18 @@ class App extends Component {
       this.onCloseForm();
     }
 
+    onUpdate = (id) => {
+      var {tasks} = this.state;
+      var index = this.findIndex(id);
+      var taskEditing =tasks[index];
+      this.setState({//lấy ra thông tin đã nhập, lưu toàn bộ vào mảng tên là taskEditing
+        taskEditing: taskEditing
+      }); 
+      this.onShowForm();
+    }
   render() {
-    var {tasks, isDisplayForm} = this.state;
-    var elmTaskForm = isDisplayForm ? <TaskForm onSubmit={this.onSubmit} onCloseForm={this.onCloseForm} /> : '';
+    var {tasks, isDisplayForm, taskEditing} = this.state;
+    var elmTaskForm = isDisplayForm ? <TaskForm onSubmit={this.onSubmit} onCloseForm={this.onCloseForm} taskEditing={taskEditing}/> : '';
     return (
       <div>
         <meta charSet="utf-8" />
@@ -122,7 +146,12 @@ class App extends Component {
                 <Control />
               <div className="row mt-15">
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                  <TaskList tasks={tasks} onUpdateStatus={this.onUpdateStatus} onDelete={this.onDelete}/>
+                  <TaskList 
+                      tasks={tasks} 
+                      onUpdateStatus={this.onUpdateStatus} 
+                      onDelete={this.onDelete}
+                      onUpdate={this.onUpdate}
+                  />
                 </div>
               </div>
             </div>
