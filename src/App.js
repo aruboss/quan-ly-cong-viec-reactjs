@@ -23,29 +23,6 @@ class App extends Component {
       }
   }
 
-    onGenerateData = () => {
-        var tasks=[
-          {
-            id: this.generateID(),
-            name: 'Học Lập Trình',
-            status: true
-          },
-          {
-            id: this.generateID(),
-            name: 'Đi bơi',
-            status: false
-          },
-          {
-            id: this.generateID(),
-            name: 'Ngủ',
-            status: true          
-          }
-        ];
-        this.setState({
-          tasks: tasks
-        });
-        localStorage.setItem('tasks',JSON.stringify(tasks));
-    }
 
   // random ra 1 số bất kỳ 
     s4(){
@@ -66,9 +43,19 @@ class App extends Component {
       });
     }
 
+    onSubmit = (data) => {
+      var {tasks} = this.state;
+      data.id = this.generateID();//task
+      tasks.push(data);
+      this.setState({
+        tasks: tasks
+      });
+      localStorage.setItem('tasks',JSON.stringify(tasks));
+    }
+
   render() {
     var {tasks, isDisplayForm} = this.state;
-    var elmTaskForm = isDisplayForm ? <TaskForm onCloseForm={this.onCloseForm} /> : '';
+    var elmTaskForm = isDisplayForm ? <TaskForm onSubmit={this.onSubmit} onCloseForm={this.onCloseForm} /> : '';
     return (
       <div>
         <meta charSet="utf-8" />
@@ -94,10 +81,6 @@ class App extends Component {
               >
                 <span className="fa fa-plus mr-5" />Thêm Công Việc
               </button>
-              {/*tạo dữ liệu mẫu*/}
-              <button type="button" className="btn btn-danger ml-5" onClick={this.onGenerateData}>
-              GenerateData 
-              </button>       
                 {/*tìm kiếm và sắp xếp */}
                 <Control />
               <div className="row mt-15">
