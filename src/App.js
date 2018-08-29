@@ -14,7 +14,8 @@ class App extends Component {
       filter : {
         name: '',
         status: -1
-      }
+      },
+      keyword: ''//phuc vụ tìm kiếm 
     }
 
   }
@@ -137,8 +138,14 @@ class App extends Component {
       });
     }
 
+    onSearch = (keyword) => {
+      this.setState({
+        keyword: keyword
+      });
+    }
+
   render() {
-    var {tasks, isDisplayForm, taskEditing, filter} = this.state;
+    var {tasks, isDisplayForm, taskEditing, filter, keyword} = this.state;
     if(filter){
       if(filter.name){
         tasks = tasks.filter((task)=>{
@@ -153,6 +160,11 @@ class App extends Component {
           }
         }); 
     }
+    if(keyword){
+        tasks = tasks.filter((task)=>{
+          return task.name.toLowerCase().indexOf(keyword) !== -1;
+        });
+      }
     var elmTaskForm = isDisplayForm ? <TaskForm onSubmit={this.onSubmit} onCloseForm={this.onCloseForm} taskEditing={taskEditing}/> : '';
     return (
       <div>
@@ -180,7 +192,7 @@ class App extends Component {
                 <span className="fa fa-plus mr-5" />Thêm Công Việc
               </button>
                 {/*tìm kiếm và sắp xếp */}
-                <Control />
+                <Control onSearch={this.onSearch}/>
               <div className="row mt-15">
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                   <TaskList 
