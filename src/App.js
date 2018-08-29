@@ -10,7 +10,11 @@ class App extends Component {
     this.state = {
       tasks: [], //id: duy nhat (unique), name, status
       isDisplayForm: false,
-      taskEditing: null
+      taskEditing: null,
+      filter : {
+        name: '',
+        status: -1
+      }
     }
 
   }
@@ -33,10 +37,18 @@ class App extends Component {
     generateID(){
       return this.s4() + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' +this.s4() + this.s4() +this.s4();   
     }
-    onToggleForm = () => {
-      this.setState({
-        isDisplayForm: !this.state.isDisplayForm
+    onToggleForm = () => { //Thêm task
+      if(this.state.isDisplayForm && this.state.taskEditing!==null){
+        this.setState({
+        isDisplayForm: true,
+        taskEditing: null
       });
+      }else{
+        this.setState({
+        isDisplayForm: !this.state.isDisplayForm,
+        taskEditing: null
+      });
+      }
     }
     onCloseForm = () => {
       this.setState({
@@ -114,8 +126,33 @@ class App extends Component {
       }); 
       this.onShowForm();
     }
+
+    onFilter = (filterName, filterStatus) => {
+      filterStatus = parseInt(filterStatus,10);
+      this.setState({
+        filter : {
+            name: filterName.toLowerCase(),
+            status: filterStatus
+      }
+      });
+    }
+
   render() {
-    var {tasks, isDisplayForm, taskEditing} = this.state;
+    var {tasks, isDisplayForm, taskEditing, filter} = this.state;
+    if(filter){
+      if(filter.name){
+        tasks = tasks.filter((task)=>{
+          return task.name.toLowerCase().indexOf(filter.name) !== -1;
+        });
+      }
+      tasks = tasks.filter((task)=>{
+          if(filter.status===-1){
+              return task;
+          }else{
+            return task.status === (filter.status===1?true:false);   
+          }
+        }); 
+    }
     var elmTaskForm = isDisplayForm ? <TaskForm onSubmit={this.onSubmit} onCloseForm={this.onCloseForm} taskEditing={taskEditing}/> : '';
     return (
       <div>
@@ -151,6 +188,7 @@ class App extends Component {
                       onUpdateStatus={this.onUpdateStatus} 
                       onDelete={this.onDelete}
                       onUpdate={this.onUpdate}
+                      onFilter={this.onFilter}
                   />
                 </div>
               </div>

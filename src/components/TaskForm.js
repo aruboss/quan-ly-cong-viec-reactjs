@@ -21,6 +21,22 @@ class TaskForm extends Component {
     }
   }
 
+  componentWillReceiveProps(nextProps){
+    if(nextProps && nextProps.taskEditing){//su dung khi chuyen tu them -> edit
+      this.setState({
+        id: nextProps.taskEditing.id,
+        name: nextProps.taskEditing.name,
+        status: nextProps.taskEditing.status
+      });
+    }else if(!nextProps.taskEditing){//edit -> thêm
+      this.setState({
+        id:'',
+        name: '',
+        status: false
+      })
+    }
+  }
+
   onCloseForm = () => {
     this.props.onCloseForm();
   }
